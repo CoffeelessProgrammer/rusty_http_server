@@ -1,54 +1,70 @@
-// RUN in Debugger:   gdb target/debug/rusty_http_server
+use http::request::HttpRequest;
+use server::HttpServer;
 
 fn main() {
-    let get = HttpMethod::GET;
-    let post = HttpMethod::POST;
-    let put = HttpMethod::PUT;
-    let delete = HttpMethod::DELETE;
+    let get = http::method::HttpMethod::GET;
+    let post = http::method::HttpMethod::POST;
+    let put = http::method::HttpMethod::PUT;
+    let delete = http::method::HttpMethod::DELETE;
 
-    let http_server = Server::new("127.0.0.1:8080".to_string());
+    // let http_server = server::HttpServer::new("127.0.0.1:8080".to_string());
+    let http_server = HttpServer::new("127.0.0.1:8080".to_string());
     http_server.run();
 }
-
-struct Server {
-    addr: String
+mod server {
+    pub struct HttpServer {
+        addr: String
+    }
+    
+    impl HttpServer {
+        // Rust Best Practice: constructors are named 'new'
+        pub fn new(addr: String) -> Self {
+            HttpServer {
+                addr
+            }
+        }
+    
+        pub fn run(self) {
+            println!("Listening on {}", self.addr);
+        }
+    }
 }
 
-impl Server {
-    // Rust Best Practice: constructors are named 'new'
-    fn new(addr: String) -> Self {
-        Server {
-            addr
+mod http {
+    pub mod request {
+        use super::method::HttpMethod;
+
+        pub struct HttpRequest {
+            path: String,
+            query_string: Option<String>,
+            // http_method: crate::http::method::HttpMethod
+            // http_method: super::method::HttpMethod  // alternative to above
+            http_method: HttpMethod
         }
     }
 
-    fn run(self) {
-        println!("Listening on {}", self.addr);
+    pub mod method {
+        pub enum HttpMethod {
+            GET,
+            HEAD,
+            POST,
+            PUT,
+            PATCH,
+            DELETE,
+            CONNECT,
+            OPTIONS,
+            TRACE
+        }
     }
-}
-
-struct Request {
-    path: String,
-    query_string: Option<String>,
-    http_method: HttpMethod
-}
-
-enum HttpMethod {
-    GET,
-    HEAD,
-    POST,
-    PUT,
-    PATCH,
-    DELETE,
-    CONNECT,
-    OPTIONS,
-    TRACE
 }
 
 /* GET /user?id=10 HTTP/1.1\r\n
  * HEADERS \r\n
  * BODY
  */
+
+
+// RUN in Debugger:   gdb target/debug/rusty_http_server
 
 // --------------------------- Terminal Output: ---------------------------
 // Listening on 127.0.0.1:8080
