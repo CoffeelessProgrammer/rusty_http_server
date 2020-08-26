@@ -1,5 +1,12 @@
+// RUN in Debugger:   gdb target/debug/rusty_http_server
+
 fn main() {
-    let http_server = Server::new("127.0.0.1:8080");
+    let get = HttpMethod::GET;
+    let post = HttpMethod::POST;
+    let put = HttpMethod::PUT;
+    let delete = HttpMethod::DELETE;
+
+    let http_server = Server::new("127.0.0.1:8080".to_string());
     http_server.run();
 }
 
@@ -16,19 +23,32 @@ impl Server {
     }
 
     fn run(self) {
+        println!("Listening on {}", self.addr);
     }
 }
 
+struct Request {
+    path: String,
+    query_string: Option<String>,
+    http_method: HttpMethod
+}
+
+enum HttpMethod {
+    GET,
+    HEAD,
+    POST,
+    PUT,
+    PATCH,
+    DELETE,
+    CONNECT,
+    OPTIONS,
+    TRACE
+}
+
+/* GET /user?id=10 HTTP/1.1\r\n
+ * HEADERS \r\n
+ * BODY
+ */
+
 // --------------------------- Terminal Output: ---------------------------
-// $ cargo build
-//    Compiling rusty_http_server v0.1.0 (C:\Users\Coffeeless\Documents\Sandboxes\RustPlayground\RustyHttpServer)
-// error[E0308]: mismatched types
-//  --> src\main.rs:2:35
-//   |
-// 2 |     let http_server = Server::new("127.0.0.1:8080");
-//   |                                   ^^^^^^^^^^^^^^^^
-//   |                                   |
-//   |                                   expected struct `std::string::String`, found `&str`
-//   |                                   help: try using a conversion method: `"127.0.0.1:8080".to_string()`
-// 
-// error: aborting due to previous error
+// Listening on 127.0.0.1:8080
